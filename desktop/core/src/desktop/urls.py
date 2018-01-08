@@ -82,10 +82,10 @@ else:
   ]
 
 dynamic_patterns += [
-  url(r'^logs$', desktop_views.log_view),
+  url(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
   url(r'^desktop/log_analytics$', desktop_views.log_analytics),
   url(r'^desktop/log_js_error$', desktop_views.log_js_error),
-  url(r'^desktop/dump_config$', desktop_views.dump_config),
+  url(r'^desktop/dump_config$', desktop_views.dump_config, name="desktop.views.dump_config"),
   url(r'^desktop/download_logs$', desktop_views.download_log_view),
   url(r'^desktop/get_debug_level', desktop_views.get_debug_level),
   url(r'^desktop/set_all_debug', desktop_views.set_all_debug),
@@ -95,9 +95,9 @@ dynamic_patterns += [
   url(r'^desktop/status_bar/?$', desktop_views.status_bar),
   url(r'^desktop/debug/is_alive$', desktop_views.is_alive),
   url(r'^desktop/debug/is_idle$', desktop_views.is_idle),
-  url(r'^desktop/debug/threads$', desktop_views.threads),
+  url(r'^desktop/debug/threads$', desktop_views.threads, name="desktop.views.threads"),
   url(r'^desktop/debug/memory$', desktop_views.memory),
-  url(r'^desktop/debug/check_config$', desktop_views.check_config),
+  url(r'^desktop/debug/check_config$', desktop_views.check_config, name="desktop.views.check_config"),
   url(r'^desktop/debug/check_config_ajax$', desktop_views.check_config_ajax),
   url(r'^desktop/log_frontend_event$', desktop_views.log_frontend_event),
 
@@ -127,7 +127,7 @@ dynamic_patterns += [
   url(r'^boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
 
   # Top level web page!
-  url(r'^$', desktop_views.index),
+  url(r'^$', desktop_views.index, name="desktop_views.index"),
 ]
 
 dynamic_patterns += [
@@ -155,7 +155,7 @@ dynamic_patterns += [
   url(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
 
   url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
-  url(r'^desktop/api2/user_preferences/(?P<key>\w+)?$', desktop_api2.user_preferences),
+  url(r'^desktop/api2/user_preferences/(?P<key>\w+)?$', desktop_api2.user_preferences, name="desktop.api2.user_preferences"),
 
   url(r'^desktop/api2/doc/export/?$', desktop_api2.export_documents),
   url(r'^desktop/api2/doc/import/?$', desktop_api2.import_documents),
@@ -176,7 +176,7 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-  url(r'^desktop/api/users/autocomplete', useradmin_views.list_for_autocomplete),
+  url(r'^desktop/api/users/autocomplete', useradmin_views.list_for_autocomplete, name='useradmin_views_list_for_autocomplete'),
   url(r'^desktop/api/users/?$', useradmin_views.get_users_by_id)
 ]
 
