@@ -213,6 +213,10 @@ var Query = function (vm, query) {
     vm.search();
   }
 
+  self.search = function() {
+    vm.search();
+  };
+
   self.togglePivotFacet = function (data) {
     data.facet.cat = data.facet.fq_fields;
     data.facet.value = data.facet.fq_values;
@@ -1619,9 +1623,9 @@ var Collection = function (vm, collection) {
     }
 
     if (direction == 'up') {
-      facet.properties.limit(facet.properties.limit() + 10);
+      facet.properties.limit(facet.properties.limit() + 100);
     } else {
-      facet.properties.limit(facet.properties.limit() - 10);
+      facet.properties.limit(facet.properties.limit() - 100);
     }
 
     vm.search();
@@ -2282,6 +2286,48 @@ var SearchViewModel = function (collection_json, query_json, initial_json, is_gr
 
       if (!facet.has_data() || facet.resultHash() != _hash) {
         facet.counts(new_facet.counts);
+        if (!facet.querySpec) { // Need to keep reference intact, because it is used to get updates from InlineAutocomplete
+          facet.querySpec = ko.observable();
+        }
+        facet.autocompleteFromEntries = function (nonPartial, partial) {
+          var result = [];
+          var partialLower = partial.toLowerCase();
+          facet.counts().forEach(function (entry) {
+            var value = typeof entry.value == "string" ? value : entry.value.toString();
+            if (value.toLowerCase().indexOf(partialLower) === 0) {
+              result.push(nonPartial + partial + value.substring(partial.length));
+            }
+          });
+          return result;
+        };
+        $.each(facet.counts(), function (index, item) {
+          item.text = item.value + ' (' + item.count + ')';
+          item.id = String(index); // Need unique ids for facet.countsSelected
+        });
+        facet.countsSelected = ko.observable();
+        facet.countsSelected.subscribe(function (newVal) {
+          for (var i = self.query.fqs().length - 1; i >= 0; i--) {
+            self.query.removeFilter(self.query.fqs()[i]);
+          }
+          counts = facet.counts();
+          for (var i = 0; i < counts.length; i++) {
+            if (counts[i].id === newVal) {
+              self.query.toggleFacet({facet: counts[i], widget_id: new_facet.id});
+              break;
+            }
+          }
+          self.query.start(0);
+          self.query.search();
+        });
+        facet.countsFiltered = ko.pureComputed(function() {
+          var querySpec = facet.querySpec();
+          if (!querySpec || !querySpec.query) return facet.counts();
+          var text = querySpec.query;
+          return facet.counts().filter(function (entry) {
+            var value = typeof entry.value == "string" ? value : entry.value.toString();
+            return value.toLowerCase().indexOf(text) >= 0;
+          });
+        });
 
         if (typeof new_facet.docs != 'undefined') {
           var _docs = [];
