@@ -383,7 +383,7 @@ ${ assist.assistPanel() }
             </tr>
             </tbody>
             <!-- ko if: createWizard.source.inputFormat() == 'query' -->
-              ${ _('Execute query to add sample data') }
+              ${ _('Add sample data') } <i class="fa fa-fw fa-play"></i>
             <!-- /ko -->
           </table>
         </div>
