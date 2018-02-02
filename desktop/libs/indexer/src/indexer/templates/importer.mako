@@ -1228,7 +1228,7 @@ ${ assist.assistPanel() }
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
 
-      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : 'file');
+      self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
 
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
@@ -1614,6 +1614,9 @@ ${ assist.assistPanel() }
           if (wizard.source.query()) {
             name = wizard.source.name();
           }
+          if (wizard.prefill.target_path().length > 0) {
+            name = wizard.prefill.target_path();
+          }
         } else if (wizard.source.inputFormat() == 'manual') {
           name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
         }
@@ -1790,7 +1793,7 @@ ${ assist.assistPanel() }
       self.prefill = ko.mapping.fromJS(${prefill | n});
 
       self.prefill.source_type.subscribe(function(newValue) {
-        self.source.inputFormat(newValue == 'manual' ? 'manual' : 'file');
+        self.source.inputFormat(newValue ? newValue : 'file');
       });
 
       self.show = ko.observable(true);
