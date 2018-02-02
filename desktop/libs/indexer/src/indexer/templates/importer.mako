@@ -1247,7 +1247,7 @@ ${ assist.assistPanel() }
           % endif
           % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
-          {'value': 'table', 'name': 'Table'},
+          ##{'value': 'table', 'name': 'Table'},
           % endif
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
