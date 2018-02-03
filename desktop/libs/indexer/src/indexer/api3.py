@@ -152,7 +152,7 @@ def guess_field_types(request):
     snippet = notebook['snippets'][0]
     db = get_api(request, snippet)
 
-    if file_format['query'].get('id'):
+    if not file_format.get('columns'):
       snippet['query'] = snippet['statement'] #self._get_current_statement(db, snippet) # TODO multi statement
       try:
         sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
@@ -169,16 +169,17 @@ def guess_field_types(request):
           "hs2_handle": None # HS2 there and valid? add sample
       }
     else:
-      sample = db.fetch_result(notebook, snippet, 4, start_over=True)
-
-      format_ = {
-          "sample": sample['rows'][:4],
-          #"sample_cols": sample.meta,
-          "columns": [
-              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-              for col in sample.meta
-          ]
-      }
+      format_ = {'status': 3}
+#       sample = db.fetch_result(notebook, snippet, 4, start_over=True)
+# 
+#       format_ = {
+#           "sample": sample['rows'][:4],
+#           #"sample_cols": sample.meta,
+#           "columns": [
+#               Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+#               for col in sample.meta
+#           ]
+#       }
   elif file_format['inputFormat'] == 'rdbms':
     query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     db = rdbms.get(request.user, query_server=query_server)
