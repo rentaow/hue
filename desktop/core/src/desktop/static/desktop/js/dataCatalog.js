@@ -1305,6 +1305,11 @@ var DataCatalog = (function () {
     return type;
   };
 
+  DataCatalogEntry.prototype.getRawType = function () {
+    var self = this;
+    return self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
+  };
+
   /**
    * Gets the source metadata for the entry. It will fetch it if not cached or if the refresh option is set.
    *
