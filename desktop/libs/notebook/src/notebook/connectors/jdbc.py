@@ -77,12 +77,24 @@ class JdbcApi(Api):
         user = properties.get('user') or self.options.get('user')
         props['properties'] = {'user': user}
         self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], user, properties.pop('password'))
-        self.db.test_connection(throw_exception=True)
+        try:
+          self.db.test_connection(throw_exception=True)
+        except:
+          self._clear_login_cache()
+          raise;
 
     if self.db is None:
       raise AuthenticationRequired()
 
     return props
+
+  def close_session(self, session):
+    self._clear_login_cache()
+
+  def _clear_login_cache(self):
+    global API_CACHE
+    self.db = None
+    API_CACHE.pop(self.cache_key, None)
 
   @query_error_handler
   def execute(self, notebook, snippet):
