@@ -149,7 +149,7 @@ class JdbcApi(Api):
     if self.db is None:
       raise AuthenticationRequired()
 
-    assist = Assist(self.db)
+    assist = self._get_assist()
     response = {'status': -1}
 
     if database is None:
@@ -174,7 +174,7 @@ class JdbcApi(Api):
     if self.db is None:
       raise AuthenticationRequired()
 
-    assist = Assist(self.db)
+    assist = self._get_assist()
     response = {'status': -1}
 
     sample_data, description = assist.get_sample_data(database, table, column)
@@ -192,6 +192,11 @@ class JdbcApi(Api):
   def cache_key(self):
     return '%s-%s' % (self.interpreter['name'], self.user.username)
 
+  def _get_assist(self):
+    if "Presto" in self.options['driver']:
+      return PrestoAssist(self.db)
+    else:
+      return Assist(self.db)
 
 class Assist():
 
@@ -222,3 +227,17 @@ class Assist():
         "CV": "CHAR_TYPE",
         "DA": "DATE_TYPE",
       }.get(name, 'STRING_TYPE')
+
+class PrestoAssist(Assist):
+
+  def get_databases(self):
+    dbs, description = query_and_fetch(self.db, 'SHOW SCHEMAS')
+    return [db[0] and db[0].strip() for db in dbs]
+
+  def get_tables(self, database, table_names=[]):
+    tables, description = query_and_fetch(self.db, 'SHOW TABLES FROM %s' % database)
+    return [{"type": "Table", "name": table[0] and table[0].strip()} for table in tables]
+
+  def get_columns(self, database, table):
+    columns, description = query_and_fetch(self.db, 'SHOW COLUMNS FROM %s.%s' % (database, table))
+    return [[col[0] and col[0].strip(), col[1], '', '', '', col[3]] for col in columns]
